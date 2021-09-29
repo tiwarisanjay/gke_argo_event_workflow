@@ -16,7 +16,7 @@ spec:
         endpoint: {{ .Values.event.eventName | printf "/%s" }} #End or your webhook url It can be anything 
         port: {{ .Values.event.port | quote }}
         method: POST
-        url: http://35.193.14.221:12000
+        url: http://updateurl:12000
       events:
         - "*"
       apiToken:
