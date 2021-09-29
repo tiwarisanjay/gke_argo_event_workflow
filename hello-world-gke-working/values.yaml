@@ -1,0 +1,6 @@
+event:
+  namespace: argo-events
+  serviceAccount: operate-workflow-sa
+workflow: 
+  namespace: workflows
+  serviceAccount: workflows

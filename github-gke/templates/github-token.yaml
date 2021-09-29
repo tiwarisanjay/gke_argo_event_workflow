@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: github-access
+  namespace: {{ .Values.event.namespace }}
+type: Opaque
+data:
+{{ (.Files.Glob "ignoreit/token").AsSecrets | indent 2 }}

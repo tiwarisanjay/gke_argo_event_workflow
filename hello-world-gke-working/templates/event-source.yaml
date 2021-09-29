@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: gke-test-es
+  namespace: {{ .Values.event.namespace }}
+spec:
+  service:
+    ports:
+      - port: 14000
+        targetPort: 14000
+  webhook:
+    gke-test:
+      port: "14000"
+      endpoint: /gke-test
+      method: POST

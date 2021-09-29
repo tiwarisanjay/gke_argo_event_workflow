@@ -1,0 +1,9 @@
+event:
+  namespace: argo-events
+  serviceAccount: operate-workflow-sa
+  eventSourceName: gke-event-source
+  eventName: gke-test 
+  port: 12000 
+workflow: 
+  namespace: workflows
+  serviceAccount: workflows
