@@ -9,11 +9,11 @@ spec:
     - port: {{ .Values.event.port }}
       targetPort: {{ .Values.event.port }}
   github:
-    {{ .Values.event.eventName | nindent 3 }}:
+    {{- .Values.event.eventNameTst | nindent 3 }}:
       owner: tiwarisanjay
       repository: tf-create-k8-namepsace
       webhook:
-        endpoint: {{ .Values.event.eventName | printf "/%s" }} #End or your webhook url It can be anything 
+        endpoint: {{ .Values.event.eventNameTst | printf "/%s" }} #End or your webhook url It can be anything 
         port: {{ .Values.event.port | quote }}
         method: POST
         url: http://updateurl:12000
@@ -24,4 +24,14 @@ spec:
         key: token
       insecure: true
       active: true
+      contentType: json
+    {{- .Values.event.eventNamePrd | nindent 3 }}:
+      owner: tiwarisanjay
+      repository: tf-create-k8-namepsace
+      webhook:
+        endpoint: {{ .Values.event.eventNamePrd | printf "/%s" }} #End or your webhook url It can be anything 
+        port: {{ .Values.event.port | quote }}
+        method: POST
+      events:
+        - "*"
       contentType: json

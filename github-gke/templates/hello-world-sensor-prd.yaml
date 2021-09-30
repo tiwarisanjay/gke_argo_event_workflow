@@ -1,0 +1,74 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: prod-sensor
+  namespace: {{ .Values.event.namespace }}
+spec:
+  template:
+    serviceAccountName: {{ .Values.event.serviceAccount }}
+  dependencies:
+  - name: prod-sensor-dependency
+    eventSourceName: {{ .Values.event.eventSourceName }}
+    eventName: {{ .Values.event.eventNamePrd }} 
+    filters:
+        data:
+          # Name of the event that triggered the delivery: [pull_request, push, yadayadayada]
+          # https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads
+          - path: body.X-GitHub-Event
+            type: string
+            value:
+              - create
+          - path: body.ref_type
+            type: string
+            value:
+              - branch
+  triggers:
+  - template:
+      name: prod-trigger-prod
+      k8s:
+          group: argoproj.io
+          version: v1alpha1
+          resource: workflows
+          operation: create
+          parameters:
+            - src:
+                dependencyName: prod-sensor-dependency
+                dataKey: body
+              dest: spec.templates.0.dag.tasks.0.arguments.parameters.0.value
+          source:
+            resource: #============== Terrafrom Workflow template
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: hello-world-prd-
+                namespace: argo-events
+                labels:
+                  workflows.argoproj.io/archive-strategy: "false"
+              spec:
+                entrypoint: full
+                serviceAccountName: {{ .Values.workflow.serviceAccount }}
+                templates:
+                - name: full
+                  dag:
+                    tasks:
+                    - name: echo-task-1
+                      template: echo-task
+                      arguments:
+                        parameters:
+                        - name: message
+                          value: Hello World
+                    - name: echo-task-2
+                      template: echo-task
+                      arguments:
+                        parameters:
+                        - name: message
+                          value: Hello World
+                - name: echo-task
+                  inputs:
+                    parameters:
+                    - name: message
+                  container:
+                    image: alpine
+                    command: [echo]
+                    args:
+                    - {{`"{{inputs.parameters.message}}"`}}
